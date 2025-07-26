@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>admin-phase</title>
+    <style>
+        /* Add a background image to the body */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-image: url('your-background-image-url.jpg'); /* Replace with your image URL */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+form, .update-form {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+/* Adjust form layout for left and right positioning */
+.left-form {
+    float: left;
+    width: 45%; /* Adjust width as needed */
+}
+
+.right-form {
+    float: right;
+    width: 45%; /* Adjust width as needed */
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Increase size of flight items */
+.flights-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.flight-item {
+    width: 200px; /* Increased size */
+    height: 200px; /* Increased size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    position: relative;
+    perspective: 1000px;
+}
+
+.flight-item-inner {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.flight-item:hover .flight-item-inner {
+    transform: rotateY(180deg);
+}
+
+.flight-item-front, .flight-item-back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.flight-item-back {
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.update-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow-y: auto;
+    max-height: 300px;
+    display: block;
+}
+
+.update-table th, .update-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.update-table th {
+    background-color: #f2f2f2;
+}
+
+.update-table td {
+    background-color: #fff;
+}
+
+.update-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.update-table tr:hover {
+    background-color: #e2e2e2;
+}
+
+.time-display {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 18px;
+}
+
+/* Clear floats after forms */
+.form-container::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+</style>
+</head>
+
+<body>
+    <button><a href="{{url_for('login')}}">Logout</a></button>
+    <h1>Manage Flights</h1>
+    <form action="{{ url_for('admin') }}" method="POST">
+        <input type="hidden" name="flight_id" id="flight-id">
+        <label for="flight-name">Flight Name:</label>
+        <input type="text" id="flight-name" name="flight_name" required><br>
+        <label for="departure-time">Departure Time:</label>
+        <input type="time" id="departure-time" name="departure_time" required><br>
+        <label for="arrival-time">Arrival Time:</label>
+        <input type="time" id="arrival-time" name="arrival_time" required><br>
+        <label for="class-type">Class:</label>
+        <select id="class-type" name="class_type" required>
+            <option value="economy">Economy</option>
+            <option value="business">Business</option>
+            <option value="first_class">First Class</option>
+        </select><br>
+        <label for="seats">Available Seats:</label>
+        <input type="number" id="seats" name="seats" required><br>
+        <button type="submit">Save Flight</button>
+    </form>
+
+    <h2>Existing Flights</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Airline</th>
+                <th>Departure Time</th>
+                <th>Seats</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for flight in flights %}
+            <tr>
+                <td>{{ flight.airline }}</td>
+                <td>{{ flight.departure_time }}</td>
+                <td>{{ flight.available_seats }}</td>
+                <td>
+                    <button onclick="editFlight('{{ flight._id }}')">Edit</button>
+                    <form action="{{ url_for('delete_flight', flight_id=flight._id) }}" method="POST">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+<script>
+    // Function to load flight details into the form for editing
+    function editFlight(flightId) {
+        fetch(`/edit_flight/${flightId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('flight-id').value = data._id['$oid']; // Set flight ID in the form
+                document.getElementById('flight-name').value = data.airline;
+                document.getElementById('departure-time').value = data.departure_time;
+                document.getElementById('arrival-time').value = data.arrival_time;
+                document.getElementById('class-type').value = data.class_type;
+                document.getElementById('seats').value = data.available_seats;
+            })
+            .catch(error => console.error('Error fetching flight details:', error));
+    }
+</script>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Quote</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .quote-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .quote-form {
+            flex: 1;
+        }
+
+        .image-flip {
+            width: 200px;
+            margin: 20px 0;
+            perspective: 1000px;
+        }
+
+        .image-flip img {
+            width: 100%;
+            height: auto;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .image-flip:hover img {
+            transform: rotateY(180deg);
+        }
+
+        .quote-form h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .flight-options,
+        .seat-options {
+            margin: 20px 0;
+        }
+
+        .get-quote-btn,
+        .confirm-btn,
+        .cancel-btn,
+        .download-ticket-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        .cancel-btn {
+            background-color: #dc3545;
+        }
+
+        .download-ticket-btn {
+            background-color: #007bff;
+        }
+
+        .quote-summary {
+            flex: 1;
+            padding-left: 20px;
+        }
+
+        .quote-summary h3 {
+            font-size: 20px;
+            color: #333;
+        }
+
+        .quote-summary img {
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="quote-container">
+        <div class="quote-form">
+            <h2>Book Ticket</h2>
+
+            <!-- Name -->
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="input-group">
+                <label for="contact">Contact Number</label>
+                <input type="tel" id="contact" name="contact" placeholder="Enter your contact number" required>
+            </div>
+
+            <!-- Available Flights -->
+            <div class="input-group flight-options">
+                <label for="flight">Select Flight</label>
+                <select id="flight" name="flight">
+                    <option value="Flight 101, 12:00 PM" data-price="300">Flight 101 - 12:00 PM</option>
+                    <option value="Flight 102, 2:00 PM" data-price="400">Flight 102 - 2:00 PM</option>
+                    <option value="Flight 103, 5:00 PM" data-price="500">Flight 103 - 5:00 PM</option>
+                </select>
+            </div>
+
+            <!-- Seat Selection -->
+            <div class="input-group seat-options">
+                <label for="seat">Select Seat Type</label>
+                <select id="seat" name="seat">
+                    <option value="Economy" data-seat-price="50">Economy - $50</option>
+                    <option value="Business" data-seat-price="100">Business - $100</option>
+                    <option value="First Class" data-seat-price="200">First Class - $200</option>
+                </select>
+            </div>
+
+            <!-- Date Selection -->
+            <div class="input-group">
+                <label for="departureDate">Departure Date</label>
+                <input type="date" id="departureDate" name="departureDate" required>
+            </div>
+
+            <!-- Image Flip for Payment Proof -->
+            <h3>Upload Payment Proof</h3>
+            <div class="image-flip">
+                <img src="{{ url_for('static', filename='images/obulscan.jpg') }}" alt="Front Scanner">
+            </div>
+
+            <!-- Payment Proof Upload -->
+            <form action="/upload_payment_proof" method="POST" enctype="multipart/form-data">
+                <input type="file" id="paymentProof" name="paymentProof" accept="image/*" required>
+                <button type="submit" class="get-quote-btn">Upload Proof</button>
+            </form>
+
+            <!-- Price Calculation -->
+            <h3>Price Details</h3>
+            <p id="flightPrice">Flight Price: $0</p>
+            <p id="seatPrice">Seat Price: $0</p>
+            <p id="tax">Tax: $0</p>
+            <p id="totalPrice">Total Price: $0</p>
+
+            <button class="get-quote-btn" onclick="calculateTotal()">Book Ticket</button>
+        </div>
+
+        <div class="quote-summary">
+            <h3>Summary</h3>
+            <img id="summaryImage" src="{{ url_for('static', filename='images/summary.jpg') }}" alt="Summary Image">
+            <p id="summaryText">No booking yet.</p>
+
+            <button class="download-ticket-btn" onclick="downloadTicket()">Download Ticket</button>
+            <button class="confirm-btn" onclick="confirmBooking()">Confirm Booking</button>
+            <button class="cancel-btn" onclick="cancelBooking()">Cancel Booking</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to calculate total price based on flight and seat selection
+        function calculateTotal() {
+            const flightPrice = parseFloat(document.getElementById('flight').selectedOptions[0].getAttribute('data-price')) || 0;
+            const seatPrice = parseFloat(document.getElementById('seat').selectedOptions[0].getAttribute('data-seat-price')) || 0;
+            const tax = (flightPrice + seatPrice) * 0.1;
+            const totalPrice = flightPrice + seatPrice + tax;
+
+            document.getElementById('flightPrice').textContent = `Flight Price: $${flightPrice}`;
+            document.getElementById('seatPrice').textContent = `Seat Price: $${seatPrice}`;
+            document.getElementById('tax').textContent = `Tax: $${tax.toFixed(2)}`;
+            document.getElementById('totalPrice').textContent = `Total Price: $${totalPrice.toFixed(2)}`;
+
+            // Update summary text
+            const name = document.getElementById('name').value;
+            const contact = document.getElementById('contact').value;
+            const flight = document.getElementById('flight').value;
+            const seat = document.getElementById('seat').value;
+            const departureDate = document.getElementById('departureDate').value;
+
+            if (name && contact && flight && seat && departureDate) {
+                document.getElementById('summaryText').innerHTML = `
+                    Name: ${name}<br>
+                    Contact: ${contact}<br>
+                    Flight: ${flight}<br>
+                    Seat: ${seat}<br>
+                    Seat Number: ${generateSeatNumber()}<br>
+                    Departure Date: ${departureDate}<br>
+                    Total Price: $${totalPrice.toFixed(2)}
+                `;
+            }
+        }
+
+        // Function to generate a random seat number
+        function generateSeatNumber() {
+            const row = Math.floor(Math.random() * 30) + 1; // Rows 1-30
+            const seat = String.fromCharCode(65 + Math.floor(Math.random() * 6)); // Columns A-F
+            return `${row}${seat}`;
+        }
+
+        // Confirm booking function
+        function confirmBooking() {
+            const name = document.getElementById('name').value;
+            const contact = document.getElementById('contact').value;
+            if (name && contact) {
+                alert(`Booking confirmed for ${name}. Contact: ${contact}`);
+            } else {
+                alert("Please enter your name and contact information.");
+            }
+        }
+
+        // Cancel booking function
+        function cancelBooking() {
+            alert("Booking has been cancelled.");
+        }
+
+        // Download ticket function (placeholder for actual download functionality)
+        function downloadTicket() {
+            alert("Ticket downloaded.");
+        }
+    </script>
+</body>
+
+</html>
