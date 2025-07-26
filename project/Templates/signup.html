@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        body {
+            background-image: url('https://wallpaperaccess.com/full/254381.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .cld {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 120vh;
+            margin: 0;
+        }
+
+        form {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            padding: 20px;
+            height:750px;
+            width: 800px;
+        }
+
+        table {
+            width: 100%;
+            margin: 0;
+        }
+
+        th {
+            padding: 10px;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .center-text {
+            text-align: center;
+        }
+
+        .spaced-button {
+            margin-bottom: 20px; /* Adds space below the button */
+        }
+    </style>
+</head>
+<body class="cld">
+    <form  method="post" name="form">
+        <table align="center" frame="box" cellspacing="10" cellpadding="3">
+            <tr>
+                <td align="center" colspan="2">
+                    <h2>Register</h2>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2" align="center">Kindly fill this form to register</th>
+            </tr>
+            <tr>
+                <th>name:</th>
+                <th><input type="text" name="name" required></th>
+            </tr>
+            <tr>
+                <th>Email:</th>
+                <th><input type="text" name="email" required></th>
+            </tr>
+            <tr>
+                <th>Password:</th>
+                <th><input type="password" name="pwd" required></th>
+            </tr>
+            <tr>
+                <th>Re-enter Password:</th>
+                <th><input type="password" name="rpwd" required></th>
+            </tr>
+            <tr>
+                <th>Gender:</th>
+                <th>
+                    Male <input type="radio" name="gender" value="male">
+                    Female <input type="radio" name="gender" value="female">
+                </th>
+            </tr>
+            <tr>
+                <th>Role:</th>
+                <th>
+                    <select id="role" name="role">
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                    </select>
+                </th>
+            </tr>
+            <tr>
+                <th>Mobile No:</th>
+                <th><input type="text" name="phn" required></th>
+            </tr>
+            <tr>
+                <th>Address:</th>
+                <th><textarea rows="5" cols="30" name="address" required>Enter address here</textarea></th>
+            </tr>
+            
+        </table>
+        <div class="center-text spaced-button">
+            <a href="/">
+                <button type="submit">Submit</button>
+            </a>
+        </div>
+    </form>
+    <br>
+    <div class="center-text">Already have an account? <a href="{{url_for('login')}}">Log in</a></div>
+</body>
+</html>

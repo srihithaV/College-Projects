@@ -1,0 +1,86 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    line-height: 1.6;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
+}
+
+header {
+    background: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.cab-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.cab-driver {
+    width: 48%;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cab-image {
+    width: 40%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.driver-details {
+    width: 55%;
+    text-align: left;
+}
+
+.driver-details h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.driver-details p {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.nearby-places {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.nearby-places h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.nearby-places ul {
+    list-style-type: none;
+}
+
+.nearby-places li {
+    background: #f4f4f4;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 5px solid #333;
+}
